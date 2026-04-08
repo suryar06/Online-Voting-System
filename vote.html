@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VotePro — Cast Your Vote</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--gold:#C9A84C;--gold2:#F0D080;--dark:#080C14;--dark2:#0E1420;--white:#F5F0E8;--green:#2ECC71;--red:#E74C3C;--blue:#4A90E2;}
+body{background:var(--dark);font-family:'DM Sans',sans-serif;color:var(--white);min-height:100vh;}
+body::after{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 900px 600px at 50% 0%,rgba(201,168,76,.05),transparent 60%);pointer-events:none;}
+
+header{position:relative;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:22px 60px;border-bottom:1px solid rgba(201,168,76,.12);}
+.logo{display:flex;align-items:center;gap:12px;text-decoration:none;}
+.logo-icon{width:36px;height:36px;border:2px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;}
+.logo-name{font-family:'Playfair Display',serif;font-size:1.1rem;background:linear-gradient(90deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.voter-info{display:flex;align-items:center;gap:10px;}
+.voter-chip{background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:6px 14px;font-size:.78rem;color:var(--gold);}
+.logout-btn{background:transparent;border:1px solid rgba(245,240,232,.1);color:rgba(245,240,232,.4);padding:6px 14px;border-radius:4px;font-size:.78rem;cursor:pointer;transition:.2s;}
+.logout-btn:hover{border-color:var(--red);color:var(--red);}
+
+/* PAGE */
+.page{position:relative;z-index:5;max-width:900px;margin:0 auto;padding:50px 30px;}
+
+/* BALLOT HEADER */
+.ballot-header{text-align:center;margin-bottom:48px;padding-bottom:32px;border-bottom:1px solid rgba(201,168,76,.15);}
+.ballot-official{display:inline-flex;align-items:center;gap:8px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);border-radius:4px;padding:6px 16px;margin-bottom:20px;font-size:.75rem;color:var(--gold);letter-spacing:2px;text-transform:uppercase;}
+.ballot-title{font-family:'Playfair Display',serif;font-size:2.6rem;margin-bottom:8px;}
+.ballot-sub{font-size:.88rem;color:rgba(245,240,232,.4);}
+.ballot-id{font-family:'Courier Prime',monospace;font-size:.78rem;color:rgba(245,240,232,.2);margin-top:8px;letter-spacing:1px;}
+
+/* INSTRUCTIONS */
+.instructions{background:rgba(74,144,226,.06);border:1px solid rgba(74,144,226,.15);border-radius:8px;padding:14px 20px;margin-bottom:36px;display:flex;align-items:center;gap:12px;}
+.instructions span{font-size:.83rem;color:rgba(74,144,226,.9);}
+
+/* CANDIDATES */
+.candidates-section{margin-bottom:36px;}
+.section-label{font-size:.72rem;color:rgba(245,240,232,.3);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;}
+.candidate-card{display:flex;align-items:center;gap:24px;padding:22px 28px;border:2px solid rgba(245,240,232,.07);border-radius:10px;margin-bottom:14px;cursor:pointer;transition:all .3s;background:rgba(245,240,232,.02);position:relative;overflow:hidden;}
+.candidate-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .3s;}
+.candidate-card:hover{border-color:rgba(201,168,76,.25);background:rgba(201,168,76,.04);}
+.candidate-card:hover::before{opacity:1;}
+.candidate-card.selected{border-color:var(--gold);background:rgba(201,168,76,.08);box-shadow:0 0 0 1px rgba(201,168,76,.2),0 8px 24px rgba(201,168,76,.1);}
+.c-number{width:36px;height:36px;border-radius:50%;background:rgba(245,240,232,.06);display:flex;align-items:center;justify-content:center;font-family:'Courier Prime',monospace;font-size:.85rem;color:rgba(245,240,232,.4);flex-shrink:0;}
+.candidate-card.selected .c-number{background:rgba(201,168,76,.2);color:var(--gold);}
+.c-symbol-wrap{width:60px;height:60px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0;}
+.c-sym-a{background:rgba(74,144,226,.12);border:1px solid rgba(74,144,226,.2);}
+.c-sym-b{background:rgba(46,204,113,.12);border:1px solid rgba(46,204,113,.2);}
+.c-sym-c{background:rgba(230,126,34,.12);border:1px solid rgba(230,126,34,.2);}
+.c-info{flex:1;}
+.c-name{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--white);}
+.c-party{font-size:.8rem;color:rgba(245,240,232,.4);margin-top:3px;}
+.c-radio{width:22px;height:22px;border-radius:50%;border:2px solid rgba(245,240,232,.2);display:flex;align-items:center;justify-content:center;transition:all .3s;flex-shrink:0;}
+.candidate-card.selected .c-radio{border-color:var(--gold);background:var(--gold);}
+.candidate-card.selected .c-radio::after{content:'✓';font-size:.7rem;color:var(--dark);font-weight:700;}
+
+/* NOTA */
+.nota-card{display:flex;align-items:center;gap:16px;padding:16px 28px;border:1px dashed rgba(245,240,232,.1);border-radius:8px;cursor:pointer;transition:all .3s;background:transparent;margin-bottom:36px;}
+.nota-card:hover{border-color:rgba(245,240,232,.2);background:rgba(245,240,232,.02);}
+.nota-card.selected{border-color:rgba(231,76,60,.3);background:rgba(231,76,60,.05);}
+.nota-label{font-size:.85rem;color:rgba(245,240,232,.4);}
+.nota-card.selected .nota-label{color:var(--red);}
+.nota-sub{font-size:.75rem;color:rgba(245,240,232,.25);margin-top:2px;}
+
+/* VOTE PREVIEW */
+.vote-preview{background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.15);border-radius:8px;padding:16px 20px;margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;}
+.preview-label{font-size:.75rem;color:rgba(201,168,76,.6);text-transform:uppercase;letter-spacing:1px;}
+.preview-val{font-size:.9rem;font-weight:600;color:var(--gold);}
+
+/* SUBMIT */
+.submit-section{text-align:center;}
+.submit-btn{padding:16px 60px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--dark);font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;border:none;border-radius:6px;cursor:pointer;transition:all .3s;letter-spacing:.5px;}
+.submit-btn:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(201,168,76,.3);}
+.submit-btn:disabled{opacity:.3;cursor:not-allowed;transform:none;}
+.submit-note{font-size:.78rem;color:rgba(245,240,232,.25);margin-top:12px;}
+
+/* ERROR */
+.err{background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.2);border-radius:6px;padding:12px 16px;margin-bottom:20px;font-size:.85rem;color:var(--red);display:none;}
+.err.show{display:block;}
+
+/* ── RECEIPT OVERLAY ── */
+.overlay{position:fixed;inset:0;background:rgba(8,12,20,.95);z-index:100;display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px);}
+.overlay.show{display:flex;}
+.receipt{background:var(--dark2);border:1px solid rgba(201,168,76,.3);border-radius:16px;max-width:500px;width:90%;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,.6),0 0 0 1px rgba(201,168,76,.1);animation:slideUp .5s cubic-bezier(.34,1.56,.64,1) forwards;}
+@keyframes slideUp{from{opacity:0;transform:translateY(40px) scale(.95);}to{opacity:1;transform:translateY(0) scale(1);}}
+.receipt-top{background:linear-gradient(135deg,rgba(46,204,113,.15),rgba(46,204,113,.05));padding:36px;text-align:center;border-bottom:1px solid rgba(201,168,76,.12);}
+.receipt-check{width:70px;height:70px;border-radius:50%;background:rgba(46,204,113,.15);border:2px solid rgba(46,204,113,.4);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:2rem;}
+.receipt-headline{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--green);margin-bottom:6px;}
+.receipt-sub{font-size:.83rem;color:rgba(245,240,232,.5);}
+.receipt-body{padding:28px 36px;}
+.receipt-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(245,240,232,.05);}
+.receipt-row:last-child{border-bottom:none;}
+.receipt-key{font-size:.75rem;color:rgba(245,240,232,.35);text-transform:uppercase;letter-spacing:.8px;}
+.receipt-val{font-size:.88rem;font-weight:600;color:var(--white);}
+.receipt-val.gold{color:var(--gold);}
+.receipt-val.green{color:var(--green);}
+.receipt-code{font-family:'Courier Prime',monospace;font-size:.8rem;color:var(--gold);letter-spacing:2px;}
+.receipt-footer{padding:20px 36px;background:rgba(245,240,232,.02);display:flex;gap:12px;}
+.r-btn{flex:1;padding:12px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .3s;border:none;}
+.r-btn-primary{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--dark);}
+.r-btn-secondary{background:transparent;border:1px solid rgba(245,240,232,.15);color:rgba(245,240,232,.6);}
+.r-btn:hover{transform:translateY(-1px);}
+
+/* ALREADY VOTED */
+.already-voted{position:fixed;inset:0;background:rgba(8,12,20,.97);z-index:200;display:none;align-items:center;justify-content:center;}
+.already-voted.show{display:flex;}
+.av-box{background:var(--dark2);border:1px solid rgba(231,76,60,.3);border-radius:16px;max-width:460px;width:90%;padding:48px;text-align:center;animation:slideUp .5s cubic-bezier(.34,1.56,.64,1);}
+.av-icon{font-size:3.5rem;margin-bottom:20px;}
+.av-title{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--red);margin-bottom:12px;}
+.av-sub{font-size:.88rem;color:rgba(245,240,232,.4);line-height:1.7;margin-bottom:28px;}
+.av-btn{display:inline-block;padding:13px 36px;background:rgba(245,240,232,.06);border:1px solid rgba(245,240,232,.15);border-radius:6px;color:var(--white);font-size:.9rem;text-decoration:none;transition:.3s;}
+.av-btn:hover{background:rgba(245,240,232,.1);}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="home.html" class="logo">
+    <div class="logo-icon">🗳</div>
+    <div class="logo-name">VotePro</div>
+  </a>
+  <div class="voter-info">
+    <div class="voter-chip" id="voterChip">Voter: —</div>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+</header>
+
+<div class="page">
+  <div class="ballot-header">
+    <div class="ballot-official">🔒 Official Ballot — Secure &amp; Encrypted</div>
+    <div class="ballot-title">Cast Your Vote</div>
+    <div class="ballot-sub">Select exactly one candidate from the list below, then submit your vote.</div>
+    <div class="ballot-id" id="ballotId">BALLOT ID: Loading...</div>
+  </div>
+
+  <div class="instructions">
+    <span>ℹ️ &nbsp;<strong>Instructions:</strong> Select one candidate only. Once submitted, your vote cannot be changed or cancelled. Voting is permanent.</span>
+  </div>
+
+  <div class="err" id="errMsg"></div>
+
+  <div class="candidates-section">
+    <div class="section-label">Candidates — Select One</div>
+
+    <div class="candidate-card" id="card-A" onclick="selectCandidate('Candidate A','A')">
+      <div class="c-number">01</div>
+      <div class="c-symbol-wrap c-sym-a">☉</div>
+      <div class="c-info">
+        <div class="c-name">Candidate A</div>
+        <div class="c-party">United Progress Party</div>
+      </div>
+      <div class="c-radio" id="radio-A"></div>
+    </div>
+
+    <div class="candidate-card" id="card-B" onclick="selectCandidate('Candidate B','B')">
+      <div class="c-number">02</div>
+      <div class="c-symbol-wrap c-sym-b">🌳</div>
+      <div class="c-info">
+        <div class="c-name">Candidate B</div>
+        <div class="c-party">Green Alliance</div>
+      </div>
+      <div class="c-radio" id="radio-B"></div>
+    </div>
+
+    <div class="candidate-card" id="card-C" onclick="selectCandidate('Candidate C','C')">
+      <div class="c-number">03</div>
+      <div class="c-symbol-wrap c-sym-c">★</div>
+      <div class="c-info">
+        <div class="c-name">Candidate C</div>
+        <div class="c-party">National Forward</div>
+      </div>
+      <div class="c-radio" id="radio-C"></div>
+    </div>
+  </div>
+
+  <div class="nota-card" id="card-NOTA" onclick="selectCandidate('NOTA','NOTA')">
+    <div style="font-size:1.2rem">⊘</div>
+    <div>
+      <div class="nota-label">NOTA — None of the Above</div>
+      <div class="nota-sub">You may choose not to vote for any candidate.</div>
+    </div>
+    <div class="c-radio" id="radio-NOTA" style="margin-left:auto"></div>
+  </div>
+
+  <div class="vote-preview" id="votePreview">
+    <div><div class="preview-label">Your Selection</div><div class="preview-val" id="previewVal">No candidate selected</div></div>
+    <div style="font-size:1.2rem" id="previewIcon">—</div>
+  </div>
+
+  <div class="submit-section">
+    <button class="submit-btn" id="submitBtn" onclick="submitVote()">Submit My Vote →</button>
+    <div class="submit-note">⚠ This action is permanent and cannot be undone.</div>
+  </div>
+</div>
+
+<!-- RECEIPT OVERLAY -->
+<div class="overlay" id="receiptOverlay">
+  <div class="receipt">
+    <div class="receipt-top">
+      <div class="receipt-check">✅</div>
+      <div class="receipt-headline">Vote Cast Successfully!</div>
+      <div class="receipt-sub">Your vote has been securely recorded. Thank you for participating.</div>
+    </div>
+    <div class="receipt-body">
+      <div class="receipt-row"><span class="receipt-key">Voter ID</span><span class="receipt-val gold" id="r-voterId">—</span></div>
+      <div class="receipt-row"><span class="receipt-key">Vote Cast For</span><span class="receipt-val green" id="r-candidate">—</span></div>
+      <div class="receipt-row"><span class="receipt-key">Status</span><span class="receipt-val green">✓ Confirmed</span></div>
+      <div class="receipt-row"><span class="receipt-key">Timestamp</span><span class="receipt-val" id="r-time">—</span></div>
+      <div class="receipt-row"><span class="receipt-key">Reference Code</span><span class="receipt-val receipt-code" id="r-code">—</span></div>
+      <div class="receipt-row"><span class="receipt-key">Re-voting</span><span class="receipt-val" style="color:var(--red)">🚫 Permanently Blocked</span></div>
+    </div>
+    <div class="receipt-footer">
+      <button class="r-btn r-btn-secondary" onclick="printReceipt()">🖨 Print Receipt</button>
+      <button class="r-btn r-btn-primary" onclick="goHome()">Return to Home →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ALREADY VOTED -->
+<div class="already-voted" id="alreadyVoted">
+  <div class="av-box">
+    <div class="av-icon">🚫</div>
+    <div class="av-title">Already Voted</div>
+    <div class="av-sub">Our records show that you have already cast your vote in this election. Each voter is permitted to vote only once.<br/><br/>If you believe this is an error, please contact the system administrator.</div>
+    <a href="home.html" class="av-btn">Return to Home</a>
+  </div>
+</div>
+
+<script>
+let selectedCandidate=null;
+const symbols={A:'☉',B:'🌳',C:'★',NOTA:'⊘'};
+
+// Check session
+const voterId=localStorage.getItem('voterId');
+if(!voterId){window.location.href='index.html';}
+document.getElementById('voterChip').textContent='Voter: '+voterId;
+document.getElementById('ballotId').textContent='BALLOT ID: VP-'+Date.now().toString(36).toUpperCase();
+
+function selectCandidate(name,key){
+  selectedCandidate=name;
+  // Clear all
+  document.querySelectorAll('.candidate-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('card-NOTA').classList.remove('selected');
+  // Select
+  const card=document.getElementById('card-'+key)||document.getElementById('card-NOTA');
+  if(card)card.classList.add('selected');
+  // Preview
+  document.getElementById('previewVal').textContent=name;
+  document.getElementById('previewIcon').textContent=symbols[key]||'⊘';
+  document.getElementById('errMsg').classList.remove('show');
+}
+
+async function submitVote(){
+  if(!selectedCandidate){
+    const err=document.getElementById('errMsg');
+    err.textContent='⚠ Please select a candidate before submitting your vote.';
+    err.classList.add('show');
+    return;
+  }
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=true;btn.textContent='Submitting...';
+
+  try{
+    const res=await fetch('/api/vote',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({voterId,candidate:selectedCandidate})
+    });
+    const result=await res.text();
+    if(result.includes('successfully')){
+      showReceipt(result);
+    }else if(result.includes('already')){
+      document.getElementById('alreadyVoted').classList.add('show');
+    }else{
+      const err=document.getElementById('errMsg');
+      err.textContent='❌ '+result;err.classList.add('show');
+      btn.disabled=false;btn.textContent='Submit My Vote →';
+    }
+  }catch(e){
+    const err=document.getElementById('errMsg');
+    err.textContent='❌ Server error. Make sure backend is running.';err.classList.add('show');
+    btn.disabled=false;btn.textContent='Submit My Vote →';
+  }
+}
+
+function showReceipt(msg){
+  const now=new Date();
+  const code='VP'+Math.random().toString(36).substring(2,8).toUpperCase()+now.getFullYear();
+  document.getElementById('r-voterId').textContent=voterId;
+  document.getElementById('r-candidate').textContent=selectedCandidate;
+  document.getElementById('r-time').textContent=now.toLocaleString();
+  document.getElementById('r-code').textContent=code;
+  document.getElementById('receiptOverlay').classList.add('show');
+}
+
+function goHome(){localStorage.removeItem('voterId');window.location.href='home.html';}
+function logout(){localStorage.removeItem('voterId');window.location.href='index.html';}
+function printReceipt(){window.print();}
+</script>
+</body>
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VotePro — Register</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--gold:#C9A84C;--gold2:#F0D080;--dark:#080C14;--dark2:#0E1420;--white:#F5F0E8;--green:#2ECC71;--red:#E74C3C;}
+body{background:var(--dark);font-family:'DM Sans',sans-serif;color:var(--white);min-height:100vh;display:flex;flex-direction:column;}
+
+/* BG */
+body::after{content:'';position:fixed;inset:0;z-index:0;
+  background:radial-gradient(ellipse 800px 600px at 20% 50%,rgba(201,168,76,.06) 0%,transparent 70%),
+             radial-gradient(ellipse 600px 400px at 80% 80%,rgba(74,144,226,.05) 0%,transparent 60%);
+  pointer-events:none;}
+
+/* HEADER */
+header{position:relative;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:24px 50px;border-bottom:1px solid rgba(201,168,76,.12);}
+.logo{display:flex;align-items:center;gap:12px;text-decoration:none;}
+.logo-icon{width:38px;height:38px;border:2px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.logo-name{font-family:'Playfair Display',serif;font-size:1.2rem;background:linear-gradient(90deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.back-link{font-size:.85rem;color:rgba(245,240,232,.4);text-decoration:none;display:flex;align-items:center;gap:6px;transition:.2s;}
+.back-link:hover{color:var(--gold);}
+
+/* PROGRESS BAR */
+.progress-bar{position:relative;z-index:10;padding:0 50px;margin-top:8px;}
+.progress-track{height:2px;background:rgba(245,240,232,.08);border-radius:2px;}
+.progress-fill{height:100%;width:50%;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:2px;transition:width .5s ease;}
+.progress-steps{display:flex;justify-content:space-between;margin-top:10px;padding:0 0;}
+.p-step{font-size:.72rem;color:rgba(245,240,232,.35);letter-spacing:.5px;}
+.p-step.active{color:var(--gold);}
+
+/* MAIN LAYOUT */
+.main{position:relative;z-index:5;display:flex;gap:0;flex:1;max-width:1200px;margin:40px auto;width:100%;padding:0 50px;}
+
+/* LEFT PANEL */
+.left-panel{width:300px;flex-shrink:0;padding-right:50px;border-right:1px solid rgba(201,168,76,.12);}
+.panel-title{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--white);margin-bottom:8px;}
+.panel-sub{font-size:.82rem;color:rgba(245,240,232,.4);line-height:1.7;margin-bottom:32px;}
+.req-list{display:flex;flex-direction:column;gap:12px;}
+.req-item{display:flex;align-items:flex-start;gap:12px;}
+.req-icon{width:32px;height:32px;border-radius:6px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;margin-top:2px;}
+.req-text{font-size:.82rem;color:rgba(245,240,232,.55);line-height:1.5;}
+.req-text strong{color:var(--white);display:block;font-size:.85rem;margin-bottom:2px;}
+
+/* RIGHT FORM */
+.form-panel{flex:1;padding-left:50px;}
+.form-title{font-family:'Playfair Display',serif;font-size:2rem;margin-bottom:6px;}
+.form-sub{font-size:.85rem;color:rgba(245,240,232,.4);margin-bottom:36px;}
+
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;}
+.form-group{display:flex;flex-direction:column;gap:7px;margin-bottom:20px;}
+.form-group.half{margin-bottom:0;}
+label{font-size:.78rem;color:rgba(245,240,232,.5);letter-spacing:.8px;text-transform:uppercase;}
+.input-wrap{position:relative;}
+input[type=text],input[type=date],input[type=tel],select{
+  width:100%;padding:13px 16px;background:rgba(245,240,232,.04);
+  border:1px solid rgba(245,240,232,.1);border-radius:6px;
+  color:var(--white);font-family:'DM Sans',sans-serif;font-size:.9rem;
+  outline:none;transition:all .3s;}
+input:focus,select:focus{border-color:rgba(201,168,76,.5);background:rgba(201,168,76,.04);box-shadow:0 0 0 3px rgba(201,168,76,.08);}
+input.valid{border-color:rgba(46,204,113,.4);}
+input.error-field{border-color:rgba(231,76,60,.4);}
+input::placeholder{color:rgba(245,240,232,.2);}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23C9A84C' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;}
+select option{background:#0E1420;color:var(--white);}
+.field-error{font-size:.75rem;color:var(--red);margin-top:4px;display:none;}
+.field-error.show{display:block;}
+.field-hint{font-size:.72rem;color:rgba(245,240,232,.3);margin-top:4px;}
+
+/* GENDER TOGGLE */
+.gender-toggle{display:flex;gap:0;border:1px solid rgba(245,240,232,.1);border-radius:6px;overflow:hidden;}
+.gender-btn{flex:1;padding:12px;text-align:center;font-size:.85rem;cursor:pointer;transition:all .3s;border:none;background:transparent;color:rgba(245,240,232,.4);}
+.gender-btn:hover{background:rgba(245,240,232,.04);}
+.gender-btn.active{background:rgba(201,168,76,.15);color:var(--gold);border-bottom:2px solid var(--gold);}
+
+/* SUBMIT */
+.submit-btn{width:100%;padding:16px;background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:var(--dark);font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:700;
+  border:none;border-radius:6px;cursor:pointer;transition:all .3s;letter-spacing:.5px;margin-top:8px;}
+.submit-btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(201,168,76,.3);}
+.submit-btn:active{transform:translateY(0);}
+.login-hint{text-align:center;margin-top:20px;font-size:.83rem;color:rgba(245,240,232,.35);}
+.login-hint a{color:var(--gold);text-decoration:none;}
+.login-hint a:hover{text-decoration:underline;}
+
+/* ERROR BANNER */
+.error-banner{background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.3);border-radius:6px;padding:12px 16px;margin-bottom:20px;font-size:.85rem;color:#E74C3C;display:none;}
+.error-banner.show{display:block;}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="home.html" class="logo">
+    <div class="logo-icon">🗳</div>
+    <div class="logo-name">VotePro</div>
+  </a>
+  <a href="home.html" class="back-link">← Back to Home</a>
+</header>
+
+<div class="progress-bar">
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-steps">
+    <span class="p-step active">Step 1: Details</span>
+    <span class="p-step">Step 2: Password</span>
+  </div>
+</div>
+
+<div class="main">
+  <div class="left-panel">
+    <div class="panel-title">Voter Registration</div>
+    <div class="panel-sub">Create your secure voter account. All details are verified and stored safely.</div>
+    <div class="req-list">
+      <div class="req-item"><div class="req-icon">🪪</div><div class="req-text"><strong>Voter ID</strong>Unique alphanumeric ID assigned to you.</div></div>
+      <div class="req-item"><div class="req-icon">🔢</div><div class="req-text"><strong>Aadhaar ID</strong>Your 12-digit national ID number.</div></div>
+      <div class="req-item"><div class="req-icon">🎂</div><div class="req-text"><strong>Age Verification</strong>You must be 18 or older to register.</div></div>
+      <div class="req-item"><div class="req-icon">🔒</div><div class="req-text"><strong>One Account</strong>Each Voter ID and Aadhaar can only register once.</div></div>
+    </div>
+  </div>
+
+  <div class="form-panel">
+    <div class="form-title">Create Your Account</div>
+    <div class="form-sub">Fill in your details accurately. All fields are required.</div>
+
+    <div class="error-banner" id="errorBanner"></div>
+
+    <div class="form-group">
+      <label>Full Name</label>
+      <div class="input-wrap">
+        <input type="text" id="name" placeholder="Enter your full legal name" oninput="validateName()"/>
+      </div>
+      <div class="field-error" id="nameErr">Please enter your full name</div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group half">
+        <label>Voter ID</label>
+        <input type="text" id="voterId" placeholder="e.g. ABC1234567" oninput="validateVoterId()"/>
+        <div class="field-error" id="voterErr">Voter ID is required</div>
+      </div>
+      <div class="form-group half">
+        <label>Aadhaar ID</label>
+        <input type="text" id="aadharId" placeholder="12-digit number" maxlength="12" oninput="validateAadhar()"/>
+        <div class="field-error" id="aadharErr">Must be exactly 12 digits</div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group half">
+        <label>Date of Birth</label>
+        <input type="date" id="dob" onchange="validateDob()"/>
+        <div class="field-error" id="dobErr">You must be 18 or older</div>
+        <div class="field-hint">Must be 18+ to register</div>
+      </div>
+      <div class="form-group half">
+        <label>Phone Number</label>
+        <input type="tel" id="phone" placeholder="10-digit mobile number" maxlength="10" oninput="validatePhone()"/>
+        <div class="field-error" id="phoneErr">Enter a valid 10-digit number</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Gender</label>
+      <div class="gender-toggle">
+        <button class="gender-btn" onclick="setGender('Male',this)">♂ Male</button>
+        <button class="gender-btn" onclick="setGender('Female',this)">♀ Female</button>
+        <button class="gender-btn" onclick="setGender('Other',this)">⊕ Other</button>
+      </div>
+      <div class="field-error" id="genderErr">Please select your gender</div>
+    </div>
+
+    <button class="submit-btn" onclick="goNext()">Continue to Set Password →</button>
+
+    <div class="login-hint">Already registered? <a href="index.html">Login here</a></div>
+  </div>
+</div>
+
+<script>
+let selectedGender='';
+
+function setGender(g,el){
+  selectedGender=g;
+  document.querySelectorAll('.gender-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('genderErr').classList.remove('show');
+}
+
+function setValid(id){const el=document.getElementById(id);if(el){el.classList.add('valid');el.classList.remove('error-field');}}
+function setError(id){const el=document.getElementById(id);if(el){el.classList.add('error-field');el.classList.remove('valid');}}
+
+function validateName(){
+  const v=document.getElementById('name').value.trim();
+  if(v.length>=2){setValid('name');document.getElementById('nameErr').classList.remove('show');return true;}
+  return false;
+}
+function validateVoterId(){
+  const v=document.getElementById('voterId').value.trim();
+  if(v.length>=3){setValid('voterId');document.getElementById('voterErr').classList.remove('show');return true;}
+  return false;
+}
+function validateAadhar(){
+  const v=document.getElementById('aadharId').value.trim();
+  if(/^\d{12}$/.test(v)){setValid('aadharId');document.getElementById('aadharErr').classList.remove('show');return true;}
+  return false;
+}
+function validateDob(){
+  const v=document.getElementById('dob').value;
+  if(!v)return false;
+  const dob=new Date(v);
+  const today=new Date();
+  let age=today.getFullYear()-dob.getFullYear();
+  const m=today.getMonth()-dob.getMonth();
+  if(m<0||(m===0&&today.getDate()<dob.getDate()))age--;
+  if(age>=18){setValid('dob');document.getElementById('dobErr').classList.remove('show');return true;}
+  setError('dob');document.getElementById('dobErr').classList.add('show');
+  document.getElementById('dobErr').textContent='You must be at least 18 years old to register.';
+  return false;
+}
+function validatePhone(){
+  const v=document.getElementById('phone').value.trim();
+  if(/^\d{10}$/.test(v)){setValid('phone');document.getElementById('phoneErr').classList.remove('show');return true;}
+  return false;
+}
+
+function showError(msg){
+  const b=document.getElementById('errorBanner');
+  b.textContent='⚠ '+msg;b.classList.add('show');
+  setTimeout(()=>b.classList.remove('show'),4000);
+}
+
+function goNext(){
+  let ok=true;
+  if(!validateName()){setError('name');document.getElementById('nameErr').classList.add('show');ok=false;}
+  if(!validateVoterId()){setError('voterId');document.getElementById('voterErr').classList.add('show');ok=false;}
+  if(!validateAadhar()){setError('aadharId');document.getElementById('aadharErr').classList.add('show');ok=false;}
+  if(!validateDob()){ok=false;}
+  if(!validatePhone()){setError('phone');document.getElementById('phoneErr').classList.add('show');ok=false;}
+  if(!selectedGender){document.getElementById('genderErr').classList.add('show');ok=false;}
+  if(!ok){showError('Please fix all errors before continuing.');return;}
+
+  localStorage.setItem('reg_name',document.getElementById('name').value.trim());
+  localStorage.setItem('reg_voterId',document.getElementById('voterId').value.trim());
+  localStorage.setItem('reg_aadharId',document.getElementById('aadharId').value.trim());
+  localStorage.setItem('reg_dob',document.getElementById('dob').value);
+  localStorage.setItem('reg_gender',selectedGender);
+  localStorage.setItem('reg_phone',document.getElementById('phone').value.trim());
+
+  document.getElementById('progressFill').style.width='100%';
+  setTimeout(()=>window.location.href='setpassword.html',300);
+}
+</script>
+</body>
+</html>
